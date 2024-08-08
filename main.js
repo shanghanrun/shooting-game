@@ -12,7 +12,52 @@ const enemyWidth =64  //ufo
 const bulletWidth=24
 const laserWidth=24
 let gameOver = false
+let speed =1
 let score =0
+
+// help 텍스트
+const help = document.createElement('div')
+help.innerHTML =`
+	<div>
+		방향키:좌우, 슈팅:space
+	</div>
+	<div>
+		총알 선택: 1(총알), 2(레이저), 3(고급레이저)
+		<br>
+		* 레이저는 연사가능
+		<br>
+		* 파괴된 잔해가 떨어져도 사망
+	</div>`
+help.style.position = 'absolute';
+help.style.top = '25%';
+help.style.left = '50%';
+help.style.transform = 'translate(-50%, -50%)';
+document.body.appendChild(help);
+// 난이도 설정 텍스트
+const indicate = document.createElement('h3')
+indicate.innerText ='게임 난이도 선택'
+indicate.style.position = 'absolute';
+indicate.style.top = '32%';
+indicate.style.left = '50%';
+indicate.style.transform = 'translate(-50%, -50%)';
+document.body.appendChild(indicate);
+
+// 난이도 설정 드롭다운 생성
+const difficultySelect = document.createElement('select');
+difficultySelect.innerHTML = `
+    <option value="1">하</option>
+    <option value="4">중</option>
+    <option value="7">상</option>
+`;
+difficultySelect.style.position = 'absolute';
+difficultySelect.style.top = '40%';
+difficultySelect.style.left = '50%';
+difficultySelect.style.transform = 'translate(-50%, -50%)';
+document.body.appendChild(difficultySelect);
+
+difficultySelect.addEventListener('change', () => {
+    speed = parseInt(difficultySelect.value);
+});
 
 //게임시작 버튼
 const startButton = document.createElement('button')
@@ -24,11 +69,16 @@ startButton.style.transform ="translate(-50%,-50%)"
 document.body.appendChild(startButton)
 
 
+
+
 startButton.addEventListener('click', startGame)
 
 function startGame(){
 	//버튼 숨기기
 	startButton.style.display ='none';
+	difficultySelect.style.display ='none';
+	indicate.style.display ='none';
+	help.style.display ='none';
 
 	//게임초기화
 	loadImage()
@@ -58,6 +108,9 @@ class Bullet{
 	checkHit(){
 		for(let i=0; i<enemyList.length; i++){
 			const bulletCenterX = this.x + bulletWidth/2
+			if(this.y <=0){  //화면을 넘어가도 사라지게
+				this.alive = false;
+			}
 			if(this.y <= enemyList[i].y && 
 				bulletCenterX>= enemyList[i].x && 
 				bulletCenterX <= enemyList[i].x +enemyWidth){
@@ -86,7 +139,7 @@ class Enemy{
 		enemyList.push(this)
 	}
 	move(){
-		this.y +=1 // 적군속도
+		this.y += speed // 적군속도
 	}
 	setOnFire(){
 		this.fire =true;
@@ -162,7 +215,8 @@ function setupKeyboardListener(){
 		}
 		if(e.code ==='Space' && isLaser ){
 			createBullet()
-		}       
+		} 
+		if(e.code ==='Escape') gameOver =true      
 	})  
 	document.addEventListener('keyup',(e)=>{
 		// keysHit[e.code] = false
