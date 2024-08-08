@@ -264,7 +264,7 @@ function update(){
 			gameOver = true;
 		}
 	}
-	// 죽은 총알 제거
+	// 죽은 총알과 불난 적군 제거
     bulletList = bulletList.filter(bullet => bullet.alive);
 	enemyList = enemyList.filter(enemy => !enemy.fire || enemy.isOnFire())
 	console.log('bulletList.length', bulletList.length)
